@@ -325,6 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
         });
+
         document.getElementById('new-post-form').addEventListener('submit', (e) => {
             e.preventDefault();
             const title = document.getElementById('new-post-title').value;
