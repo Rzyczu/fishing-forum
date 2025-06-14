@@ -60,10 +60,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         // Pokaż/ukryj sekcję dodawania wpisu lub komentarza w zależności od strony
         if (!isPostPage) {
-            document.getElementById('new-post-section').style.display = currentUser ? 'block' : 'none';
-            if (currentUser && currentUser.isAdmin) {
-                document.getElementById('category-admin').style.display = 'flex';
-            }
+            document.getElementById('category-filter').addEventListener('change', (e) => {
+                const sortOrder = document.getElementById('sort-order').value;
+                loadPosts(e.target.value, sortOrder);
+            });
+
+            document.getElementById('sort-order').addEventListener('change', (e) => {
+                const categoryId = document.getElementById('category-filter').value;
+                loadPosts(categoryId, e.target.value);
+            });
         } else {
             document.getElementById('new-comment-section').style.display = currentUser ? 'block' : 'none';
         }
@@ -91,11 +96,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function loadPosts(categoryId = '') {
+    async function loadPosts(categoryId = '', sortOrder = 'desc') {
         let url = '/api/posts';
+        const params = new URLSearchParams();
         if (categoryId) {
-            url += '?category=' + categoryId;
+            params.append('category', categoryId);
         }
+        if (sortOrder) {
+            params.append('sort', sortOrder);
+        }
+        if (params.toString()) {
+            url += '?' + params.toString();
+        }
+
         const res = await fetch(url);
         const posts = await res.json();
         const postsDiv = document.getElementById('posts');
@@ -277,11 +290,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Eventy specyficzne dla strony głównej vs strony wpisu
     if (!isPostPage) {
         document.getElementById('category-filter').addEventListener('change', (e) => {
-            loadPosts(e.target.value);
+            const sortOrder = document.getElementById('sort-order').value;
+            loadPosts(e.target.value, sortOrder);
         });
+
         document.getElementById('add-category-btn').addEventListener('click', (e) => {
             e.preventDefault();
             const name = document.getElementById('new-category-name').value.trim();

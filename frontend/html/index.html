@@ -11,7 +11,7 @@
 <body>
     <header>
         <div id="logo-title">
-            <img src="/assets/logo.png" alt="Logo Węgorz" id="logo">
+            <img href="index.html" src="/assets/logo.png" alt="Logo Węgorz" id="logo">
             <h1>Węgorz - Twoje Forum Wędkarskie</h1>
         </div>
         <div id="user-info">
@@ -23,6 +23,12 @@
         <select id="category-filter">
             <option value="">Wszystkie</option>
         </select>
+        <label for="sort-order">Sortowanie:</label>
+        <select id="sort-order">
+            <option value="desc" selected>Najnowsze</option>
+            <option value="asc">Najstarsze</option>
+        </select>
+
         <div id="category-admin" style="display:none;">
             <input type="text" id="new-category-name" placeholder="Nazwa nowej kategorii">
             <button id="add-category-btn">Dodaj kategorię</button>

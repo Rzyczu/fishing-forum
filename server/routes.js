@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const db = require('./db');
+const bcrypt = require('bcrypt');
+
+const loginAttempts = {};
 
 // Rejestracja nowego użytkownika
 router.post('/api/register', (req, res) => {
@@ -10,48 +13,91 @@ router.post('/api/register', (req, res) => {
         return res.status(400).send('Brak nazwy użytkownika lub hasła');
     }
     // Domyślnie nowy użytkownik nie jest adminem (is_admin = 0)
-    db.query('INSERT INTO users (username, password, is_admin) VALUES (?, ?, 0)',
-        [username, password], (err, result) => {
-            if (err) {
-                if (err.code === 'ER_DUP_ENTRY') {
-                    // Nazwa użytkownika już zajęta
-                    return res.redirect('/register.html?error=exists');
-                } else {
-                    return res.status(500).send('Błąd bazy danych');
+    bcrypt.hash(password, 10, (err, hash) => {
+        if (err) return res.status(500).send('Błąd szyfrowania hasła');
+        db.query('INSERT INTO users (username, password, is_admin) VALUES (?, ?, 0)',
+            [username, hash], (err2, result) => {
+                if (err2) {
+                    if (err2.code === 'ER_DUP_ENTRY') {
+                        return res.redirect('/register.html?error=exists');
+                    } else {
+                        return res.status(500).send('Błąd bazy danych');
+                    }
                 }
-            }
-            // Po rejestracji automatycznie zaloguj użytkownika
-            req.session.user = { id: result.insertId, username: username, isAdmin: false };
-            return res.redirect('/');
-        });
+                req.session.user = { id: result.insertId, username: username, isAdmin: false };
+                return res.redirect('/');
+            });
+    });
 });
 
 // Logowanie użytkownika
 router.post('/api/login', (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
+    const now = Date.now();
+
     if (!username || !password) {
         return res.redirect('/login.html?error=1');
     }
+
+    // Inicjalizacja rekordu prób
+    if (!loginAttempts[username]) {
+        loginAttempts[username] = { count: 0, blockedUntil: null };
+    }
+
+    const attempt = loginAttempts[username];
+
+    // Sprawdzenie blokady
+    if (attempt.blockedUntil && now < attempt.blockedUntil) {
+        return res.redirect('/login.html?error=locked');
+    }
+
     db.query('SELECT id, username, password, is_admin FROM users WHERE username = ?',
         [username], (err, results) => {
             if (err) return res.status(500).send('Błąd bazy danych');
             if (results.length === 0) {
-                // Użytkownik nie istnieje
+                attempt.count++;
+                if (attempt.count >= 3) {
+                    attempt.blockedUntil = now + 5 * 60 * 1000; // 5 minut blokady
+                    attempt.count = 0; // resetujemy licznik po nałożeniu blokady
+                }
                 return res.redirect('/login.html?error=1');
             }
             const user = results[0];
-            if (user.password !== password) {
-                // Błędne hasło
-                return res.redirect('/login.html?error=1');
+            bcrypt.compare(password, user.password, (err, isMatch) => {
+                if (err) return res.status(500).send('Błąd porównania haseł');
+                if (isMatch) {
+                    return loginSuccess(req, res, user, username);
+                } else {
+                    // Sprawdź, czy to hasło jawne (stary wpis)
+                    if (user.password === password) {
+                        // Hasło pasuje, więc od razu szyfrujemy i zapisujemy
+                        bcrypt.hash(password, 10, (err2, hash) => {
+                            if (!err2) {
+                                db.query('UPDATE users SET password = ? WHERE id = ?', [hash, user.id]);
+                            }
+                            return loginSuccess(req, res, user, username);
+                        });
+                    } else {
+                        attempt.count++;
+                        if (attempt.count >= 3) {
+                            attempt.blockedUntil = now + 5 * 60 * 1000;
+                            attempt.count = 0;
+                        }
+                        return res.redirect('/login.html?error=1');
+                    }
+                }
+            });
+
+            function loginSuccess(req, res, user, username) {
+                loginAttempts[username] = { count: 0, blockedUntil: null };
+                req.session.user = {
+                    id: user.id,
+                    username: user.username,
+                    isAdmin: (user.is_admin ? true : false)
+                };
+                return res.redirect('/');
             }
-            // Uwierzytelnienie poprawne – zapisz dane użytkownika w sesji
-            req.session.user = {
-                id: user.id,
-                username: user.username,
-                isAdmin: (user.is_admin ? true : false)
-            };
-            return res.redirect('/');
         });
 });
 
@@ -100,12 +146,17 @@ router.get('/api/posts', (req, res) => {
         'users.username AS authorName, categories.name AS categoryName ' +
         'FROM posts JOIN users ON posts.user_id = users.id ' +
         'JOIN categories ON posts.category_id = categories.id';
-    const params = [];
+
+    const params = [];  // ← DODAJ TO
+
     if (req.query.category) {
         sql += ' WHERE posts.category_id = ?';
         params.push(req.query.category);
     }
-    sql += ' ORDER BY posts.created_at DESC';
+
+    const sort = (req.query.sort === 'asc') ? 'ASC' : 'DESC';
+    sql += ' ORDER BY posts.created_at ' + sort;
+
     db.query(sql, params, (err, results) => {
         if (err) return res.status(500).send('Błąd bazy danych');
         res.json(results);
@@ -281,9 +332,12 @@ router.put('/api/account', (req, res) => {
         return res.status(400).send('Brak hasła');
     }
     const userId = req.session.user.id;
-    db.query('UPDATE users SET password = ? WHERE id = ?', [newPass, userId], (err) => {
-        if (err) return res.status(500).send('Błąd bazy danych');
-        res.sendStatus(200);
+    bcrypt.hash(newPass, 10, (err, hash) => {
+        if (err) return res.status(500).send('Błąd szyfrowania hasła');
+        db.query('UPDATE users SET password = ? WHERE id = ?', [hash, userId], (err2) => {
+            if (err2) return res.status(500).send('Błąd bazy danych');
+            res.sendStatus(200);
+        });
     });
 });
 

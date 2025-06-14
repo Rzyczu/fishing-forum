@@ -29,11 +29,13 @@
             <button type="submit">Zaloguj</button>
         </form>
         <div style="color: red;">
-            <!-- Miejsce na komunikaty błędów -->
             <script>
                 const params = new URLSearchParams(window.location.search);
-                if (params.get('error')) {
+                const error = params.get('error');
+                if (error === '1') {
                     document.write('Nieprawidłowa nazwa użytkownika lub hasło.');
+                } else if (error === 'locked') {
+                    document.write('Konto zostało tymczasowo zablokowane z powodu zbyt wielu nieudanych prób logowania. Spróbuj ponownie za kilka minut.');
                 }
             </script>
         </div>
