@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isPostPage) {
             document.getElementById('new-post-section').style.display = currentUser ? 'block' : 'none';
             if (currentUser && currentUser.isAdmin) {
-                document.getElementById('category-admin').style.display = 'block';
+                document.getElementById('category-admin').style.display = 'flex';
             }
         } else {
             document.getElementById('new-comment-section').style.display = currentUser ? 'block' : 'none';
@@ -223,10 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
             contentP.className = 'content';
             contentP.textContent = comment.content;
             commentDiv.appendChild(contentP);
-            metaDiv.innerHTML =
-                'Autor: ' + post.authorName + '<br>' +
-                'Kategoria: ' + post.categoryName + '<br>' +
-                'Dodano: ' + dateStr;
+            const metaDiv = document.createElement('div');
             metaDiv.className = 'meta';
             const dateStr = new Date(comment.created_at).toLocaleString('pl-PL');
             metaDiv.textContent = 'Autor: ' + comment.authorName + ', ' + dateStr;

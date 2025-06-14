@@ -1,9 +1,19 @@
+html,
 body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
     font-family: sans-serif;
     margin: 0;
     padding: 0;
     background: #f4f4f4;
 }
+
 
 header {
     background: #228B22;
@@ -23,6 +33,14 @@ header #user-info a {
     color: white;
 }
 
+footer {
+    background: #eee;
+    text-align: center;
+    padding: 10px;
+    font-size: 0.9em;
+    color: #555;
+}
+
 nav {
     background: #eee;
     padding: 10px;
@@ -32,8 +50,20 @@ nav {
     gap: 10px;
 }
 
+#logo-title {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+#logo {
+    height: 100px;
+}
+
+
 main {
     margin: 15px;
+    flex: 1;
 }
 
 #posts {
@@ -67,10 +97,11 @@ main {
 }
 
 #category-admin {
+    width: 100%;
     margin-top: 5px;
     display: flex;
+    flex-direction: row;
     gap: 5px;
-    flex-wrap: wrap;
 }
 
 #new-post-section,
@@ -127,8 +158,7 @@ button:hover {
     opacity: 0.9;
 }
 
-input[type="text"],
-input[type="password"],
+input,
 select,
 textarea {
     padding: 8px;
@@ -136,6 +166,7 @@ textarea {
     border-radius: 4px;
     width: 100%;
     box-sizing: border-box;
+    margin: 5px 0 10px 0;
 }
 
 form {
@@ -146,6 +177,9 @@ form {
     border-radius: 6px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
+
+
+
 
 body>form,
 body>h1 {
