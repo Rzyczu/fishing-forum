@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Węgorz</title>
+    <link rel="stylesheet" href="/assets/style.css">
+</head>
+
+<body>
+    <header>
+        <h1>Węgorz - Twoje Forum Wędkarskie</h1>
+        <div id="user-info">
+            <!-- Sekcja uzupełniana przez script.js: linki logowania/rejestracji lub info o zalogowanym użytkowniku -->
+        </div>
+    </header>
+    <nav>
+        <label for="category-filter">Kategorie:</label>
+        <select id="category-filter">
+            <option value="">Wszystkie</option>
+        </select>
+        <div id="category-admin" style="display:none;">
+            <input type="text" id="new-category-name" placeholder="Nazwa nowej kategorii">
+            <button id="add-category-btn">Dodaj kategorię</button>
+        </div>
+    </nav>
+    <main>
+        <div id="posts">
+            <!-- Lista postów wczytywana dynamicznie przez script.js -->
+        </div>
+        <div id="new-post-section" style="display:none;">
+            <h2>Dodaj nowy wpis</h2>
+            <form id="new-post-form">
+                <input type="text" id="new-post-title" name="title" placeholder="Tytuł" required><br>
+                <textarea id="new-post-content" name="content" placeholder="Treść" required></textarea><br>
+                <label>Kategoria:
+                    <select id="post-category" name="category" required></select>
+                </label><br>
+                <button type="submit">Opublikuj</button>
+            </form>
+        </div>
+    </main>
+    <script src="/assets/script.js"></script>
+</body>
+
+</html>

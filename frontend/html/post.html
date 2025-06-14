@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Wpis – Węgorz</title>
+    <link rel="stylesheet" href="/assets/style.css">
+</head>
+
+<body>
+    <header>
+        <h1>Węgorz - Twoje Forum Wędkarskie</h1>
+        <div id="user-info">
+            <!-- Informacja o użytkowniku lub linki logowania/rejestracji -->
+        </div>
+    </header>
+    <nav>
+        <a href="index.html">&#8592; Wróć do forum</a>
+    </nav>
+    <main>
+        <article id="post">
+            <h2 id="post-title"></h2>
+            <div id="post-meta"></div>
+            <p id="post-content"></p>
+            <div id="post-actions"></div>
+        </article>
+        <section id="comments-section">
+            <h3>Komentarze</h3>
+            <div id="comments"></div>
+            <div id="new-comment-section" style="display:none;">
+                <form id="new-comment-form">
+                    <textarea id="comment-content" placeholder="Treść komentarza" required></textarea><br>
+                    <button type="submit">Dodaj komentarz</button>
+                </form>
+            </div>
+        </section>
+    </main>
+    <script src="/assets/script.js"></script>
+</body>
+
+</html>
