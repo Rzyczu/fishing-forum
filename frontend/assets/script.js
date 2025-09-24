@@ -72,6 +72,16 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             document.getElementById('new-comment-section').style.display = currentUser ? 'block' : 'none';
         }
+
+        const newPostSection = document.getElementById('new-post-section');
+        if (newPostSection) {
+            newPostSection.style.display = currentUser ? 'block' : 'none';
+        }
+
+        const categoryAdminSection = document.getElementById('category-admin');
+        if (categoryAdminSection) {
+            categoryAdminSection.style.display = (currentUser && currentUser.isAdmin) ? 'flex' : 'none';
+        }
     }
 
     async function loadCategories() {
