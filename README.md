@@ -129,6 +129,14 @@ node server/app.js
 
 ---
 
+## Demo
+
+<img width="1273" height="777" alt="image" src="https://github.com/user-attachments/assets/ffbd65e3-781d-4f45-ae5c-3507dfe36ef5" />
+<img width="996" height="738" alt="image" src="https://github.com/user-attachments/assets/dafe7e07-2b96-403a-a81c-7403695016dd" />
+<img width="868" height="393" alt="image" src="https://github.com/user-attachments/assets/06b5bb97-f354-40ec-afaa-77b0ddc620c8" />
+<img width="915" height="568" alt="image" src="https://github.com/user-attachments/assets/62482d0e-504d-4a77-98d7-6d6d45e28d22" />
+
+
 ## Notes
 
 - Frontend JS (`assets/script.js`) handles session UI, filtering by category, sorting posts by date, and CRUD actions via the API.
